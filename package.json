@@ -1,0 +1,21 @@
+{
+  "name": "remote-desktop.js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jimp": "^0.8.5",
+    "node-rdpjs": "^0.3.0",
+    "pngjs": "^3.4.0",
+    "rfb2": "^0.2.0",
+    "socket.io": "^2.3.0",
+    "tunnel-ssh": "^4.1.4"
+  }
+}

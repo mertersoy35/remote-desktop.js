@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>JavaScript Remote Desktop Client</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="Javascript RFB Client">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/bootstrap.css">
+</head>
+
+<body>
+  <div class="container" id=login-page name="container" style="display: block;">
+    <div class="page-header">
+      <h1 style="color:rgb(30, 30, 65); margin-top: 30px; margin-bottom: 30px;"> JavaScript Remote Desktop Client</h1>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <form>
+          <div id="ip" class="form-group">
+            <label for="ipaddress">IP Address:</label>
+            <input type="text" class="form-control" id="ipaddress" aria-describedby="ipaddress_help"
+              placeholder="Enter IP address">
+            <small id="ipaddress_help" class="form-text text-muted">Please enter the IP address of VNC
+              connection.</small>
+          </div>
+          <div id="rdpdomain" class="form-group" style="display:none">
+            <label for="rdpdomainname">RDP Domain:</label>
+            <input type="text" class="form-control" id="rdpdomainname" aria-describedby="rdpdomainname_help"
+              placeholder="Enter RDP domain">
+            <small id="rdpdomainname_help" class="form-text text-muted">Please enter the RDP domain. Leave empty if not
+              in domain.</small>
+          </div>
+          <div id="rdpuser" class="form-group" style="display:none">
+            <label for="rdpusername">RDP Username:</label>
+            <input type="text" class="form-control" id="rdpusername" aria-describedby="rdpusername_help"
+              placeholder="Enter RDP username">
+            <small id="rdpusername_help" class="form-text text-muted">Please enter the RDP username.</small>
+          </div>
+          <div id="rfbport" class="form-group">
+            <label for="portnumber">VNC Port:</label>
+            <input type="text" class="form-control" id="portnumber" aria-describedby="portnumber_help"
+              placeholder="Enter port">
+            <small id="portnumber_help" class="form-text text-muted">Please enter the port of VNC connection.</small>
+          </div>
+          <div id="pass" class="form-group">
+            <label id="pass-lbl" for="password">VNC Password:</label>
+            <input type="password" class="form-control" id="password" aria-describedby="password_help"
+              placeholder="Enter password">
+            <small id="password_help" class="form-text text-muted">Please enter the password of VNC connection. Leave
+              empty if there is no password.</small>
+          </div>
+          <div id="sshtunnelport" class="form-group" style="display:none">
+            <label for="sshtunnelportnumber">SSH Tunnel Port:</label>
+            <input type="text" class="form-control" id="sshtunnelportnumber" aria-describedby="sshtunnelportnumber_help"
+              placeholder="Enter port">
+            <small id="sshtunnelportnumber_help" class="form-text text-muted">Please enter the port of SSH tunneling.
+              This port tunnels the connection to the RFB port.
+              If application is installed on same server as RFB connection supplied do not use same port as RFB port.
+              <br>Ex: ssh -L [SSH_TUNNEL_PORT]:127.0.0.1:[RFB_PORT] [IP_ADRESS]</small>
+          </div>
+          <div id="sshport" class="form-group" style="display:none">
+            <label for="sshportnumber">SSH Port:</label>
+            <input type="text" class="form-control" id="sshportnumber" aria-describedby="sshportnumber_help" value=22>
+            <small id="sshportnumber_help" class="form-text text-muted">Please enter the port of SSH connection. Default
+              is 22.</small>
+          </div>
+          <div id="sshuser" class="form-group" style="display:none">
+            <label for="sshusername">SSH Username:</label>
+            <input type="text" class="form-control" id="sshusername" aria-describedby="sshusername_help"
+              placeholder="Enter SSH username">
+            <small id="sshusername_help" class="form-text text-muted">Please enter the username of SSH
+              connection.</small>
+          </div>
+          <div id="sshpass" class="form-group" style="display:none">
+            <label for="sshpassword">SSH Password:</label>
+            <input type="password" class="form-control" id="sshpassword" aria-describedby="sshpassword_help"
+              placeholder="Enter SSH password">
+            <small id="sshpassword_help" class="form-text text-muted">Please enter the password of SSH
+              connection.</small>
+          </div>
+          <div class="control-group">
+            <button type="button" class="btn btn-primary" id=login-button>Connect</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-sm">
+        <form name="conn">
+          <div>
+            <h2>Connection type:</h2>
+          </div>
+          <div class="form-group">
+            <input type="radio" name="connType" id="rb-rfb" aria-describedby="rb-rfb-help" value="rfb"
+              checked="checked" />
+            <label for="rb-rfb">VNC</label><br />
+            <small id="rb-rfb-help" class="form-text text-muted">VNC without any encryption. Works on Windows, Linux,
+              MacOSX.</small>
+          </div>
+          <div class="form-group">
+            <input type="radio" name="connType" id="rb-rfb-ssh" aria-describedby="rb-rfb-ssh-help" value="rfbssh" />
+            <label for="rb-rfb-ssh">VNC with SSH tunneling</label><br />
+            <small id="rb-rfb-ssh-help" class="form-text text-muted">VNC with encryption over SSH. Works on Windows,
+              Linux, MacOSX.</small>
+          </div>
+          <div class="form-group">
+            <input type="radio" name="connType" id="rb-rdp" aria-describedby="rb-rdp-help" value="rdp" />
+            <label for="rb-rdp">RDP</label><br />
+            <small id="rb-rdp-help" class="form-text text-muted">RDP with encryption. Works on Windows.</small>
+          </div>
+        </form>
+
+        <form name="compress">
+          <div>
+            <h3>Image compression type:</h2>
+          </div>
+          <div class="container">
+            <div class="form-group">
+              <input type="radio" name="compType" id="comp-png" value="comppng" checked="checked" />
+              <label for="comp-png">PNG</label><br />
+            </div>
+            <div class="form-group">
+              <input type="radio" name="compType" id="comp-jpg" value="compjpg" />
+              <label for="comp-jpg">JPG</label><br />
+            </div>
+            <div class="form-group">
+              <input type="radio" name="compType" id="comp-bmp" value="compbmp" />
+              <label for="comp-bmp">BMP</label><br />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id=rfb-screen style="display: none;">
+    <canvas id="rfb-canvas"></canvas>
+    <div>
+      <button id="disconnect-button" class="btn btn-primary">Disconnect</button>
+      <button id="ctrl-alt-del" class="btn btn-primary">Send Ctrl-Alt-Del</button>
+      <button id="fullscreen" class="btn btn-primary">Fullscreen</button>
+    </div>
+  </div>
+
+
+  <script src=./socket.io/socket.io.js> </script> <script src=./js/app.js> </script> <script src=./js/client.js>
+  </script> <script src=./js/keyMap.js> </script> <script src=./js/bluebird.js> </script> </body> </html>
