@@ -44,7 +44,7 @@ io.sockets.on('connection', function (socket) {
         rdpClient.sendPointerEvent(mouse.x, mouse.y, mouse.button, mouse.state);
       });
       socket.on('keys', function (keys) {
-        rdpClient.sendKeyEventUnicode(keys.key, keys.state);
+        rdpClient.sendKeyEventScancode(keys.key, keys.state);
       });
       socket.on('disconnect', function () {
         rdpClient.close();

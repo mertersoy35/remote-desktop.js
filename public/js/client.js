@@ -185,8 +185,8 @@ const mouseEventEmit = function (x, y, button, state) {
 
 const keyEventEmit = function (key, shift, state) {
   if (radVal == 'rdp') {
-    let keyTransmit = rdpKeyMap[key];
-    //console.log(keyTransmit);
+    let unicode = rdpUnicode[key];
+    let keyTransmit = rdpKeyMap[unicode];
     socket.emit('keys', {
       key: keyTransmit,
       state: state,
