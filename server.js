@@ -8,7 +8,7 @@ const tunnel = require('tunnel-ssh');
 const arg = process.argv[2]; // Entering port number from the command lines
 process.setMaxListeners(100);
 
-const Param = {
+const Params = {
   httpPort: arg || 8090,
   connType: 'rfb',
   compType: 'comppng',
@@ -18,24 +18,24 @@ const app = express();
 const server = http.createServer(app);
 app.use(express.static(__dirname + '/public/')); // Set "public" as web page root
 
-server.listen(Param.httpPort);
-console.log('Server listening on port: ', Param.httpPort);
+server.listen(Params.httpPort);
+console.log('Server listening on port: ', Params.httpPort);
 console.log("Start server again with 'node " + process.argv[1].split("/").slice(-1)[0] + " [PORT_NUMBER]' to change port.");
 io = io.listen(server);
 
 io.sockets.on('connection', function (socket) {
   console.log('Socket.io entablished...');
   socket.on('type', function (type) {
-    Param.connType = type.conn;
-    console.log('Connection type changed to: ' + Param.connType);
+    Params.connType = type.conn;
+    console.log('Connection type changed to: ' + Params.connType);
   });
   socket.on('comp', function (comp) {
-    Param.compType = comp.comp;
-    console.log('Compression type changed to: ' + Param.compType);
+    Params.compType = comp.comp;
+    console.log('Compression type changed to: ' + Params.compType);
   });
   socket.on('remote', function (config) {
     let rdpClient;
-    if (Param.connType == 'rdp') {
+    if (Params.connType == 'rdp') {
       if (rdpClient) {
         rdpClient.close(); // Close previous connection
       };
@@ -52,8 +52,11 @@ io.sockets.on('connection', function (socket) {
       });
     }
     else {
-      if (Param.connType == 'rfbssh') {
-        createSSHtunnel(config);
+      if (Params.connType == 'rfbssh') {
+        let sshTunnel = createSSHtunnel(config);
+        sshTunnel.on('error', function() {
+          console.log('SSH connection error!');
+        })
       }
       let r = createRfbConnection(config, socket);
       socket.on('mouse', function (mouse) {
@@ -83,14 +86,15 @@ function createSSHtunnel(config) {
     localPort: config.sshtunnelport,
     keepAlive: true
   }
-  tunnel(options, function (error, server) {
-    console.log('SSH connection entablished...');
+  let sshTunnel = tunnel(options, function () {
+    console.log('SSH connection entablishing...');
   });
+  return sshTunnel;
 }
 
 function createRfbConnection(config, socket) {
   let r;
-  if (Param.connType == 'rfbssh') {
+  if (Params.connType == 'rfbssh') {
     try {
       r = rfb.createConnection({
         host: '127.0.0.1',
@@ -220,17 +224,17 @@ function rdpDraw(rdpClient, socket) {
 
 function getBuffer (pngImage) {
   let buffer;
-  if (Param.compType == 'comppng') {
+  if (Params.compType == 'comppng') {
     pngImage.getBase64(Jimp.MIME_PNG, function (err, res) {
       buffer = res;
     });
   }
-  if (Param.compType == 'compjpg') {
+  if (Params.compType == 'compjpg') {
     pngImage.getBase64(Jimp.MIME_JPEG, function (err, res) {
       buffer = res;
     });
   }
-  if (Param.compType == 'compbmp') {
+  if (Params.compType == 'compbmp') {
     pngImage.getBase64(Jimp.MIME_BMP, function (err, res) {
       buffer = res;
     });
