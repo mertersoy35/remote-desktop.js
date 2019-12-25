@@ -1,45 +1,45 @@
-var rfb = require('rfb2');
-var io = require('socket.io');
-var express = require('express');
-var http = require('http');
-var Jimp = require('jimp');
-var tunnel = require('tunnel-ssh');
-var rdp = require('node-rdpjs');
-var arg = process.argv[2]; // Entering port number from the command lines
+const express = require('express');
+let io = require('socket.io');
+const http = require('http');
+const rfb = require('rfb2');
+const rdp = require('node-rdpjs');
+const Jimp = require('jimp');
+const tunnel = require('tunnel-ssh');
+const arg = process.argv[2]; // Entering port number from the command lines
 process.setMaxListeners(100);
 
-var Config = {
+const Param = {
   httpPort: arg || 8090,
   connType: 'rfb',
   compType: 'comppng',
 };
 
-var app = express();
-var server = http.createServer(app);
+const app = express();
+const server = http.createServer(app);
 app.use(express.static(__dirname + '/public/')); // Set "public" as web page root
 
-server.listen(Config.httpPort);
-console.log('Server listening on port: ', Config.httpPort);
+server.listen(Param.httpPort);
+console.log('Server listening on port: ', Param.httpPort);
 console.log("Start server again with 'node " + process.argv[1].split("/").slice(-1)[0] + " [PORT_NUMBER]' to change port.");
 io = io.listen(server);
 
 io.sockets.on('connection', function (socket) {
   console.log('Socket.io entablished...');
   socket.on('type', function (type) {
-    Config.connType = type.conn;
-    console.log('Connection type changed to: ' + Config.connType);
+    Param.connType = type.conn;
+    console.log('Connection type changed to: ' + Param.connType);
   });
   socket.on('comp', function (comp) {
-    Config.compType = comp.comp;
-    console.log('Compression type changed to: ' + Config.compType);
+    Param.compType = comp.comp;
+    console.log('Compression type changed to: ' + Param.compType);
   });
   socket.on('remote', function (config) {
-    var rdpClient;
-    if (Config.connType == 'rdp') {
+    let rdpClient;
+    if (Param.connType == 'rdp') {
       if (rdpClient) {
         rdpClient.close(); // Close previous connection
       };
-      var rdpClient = createRdpConnection(config, socket);
+      rdpClient = createRdpConnection(config, socket);
       socket.on('mouse', function (mouse) {
         rdpClient.sendPointerEvent(mouse.x, mouse.y, mouse.button, mouse.state);
       });
@@ -52,10 +52,10 @@ io.sockets.on('connection', function (socket) {
       });
     }
     else {
-      if (Config.connType == 'rfbssh') {
+      if (Param.connType == 'rfbssh') {
         createSSHtunnel(config);
       }
-      var r = createRfbConnection(config, socket);
+      let r = createRfbConnection(config, socket);
       socket.on('mouse', function (mouse) {
         r.pointerEvent(mouse.x, mouse.y, mouse.button);
       });
@@ -72,7 +72,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 function createSSHtunnel(config) {
-  var options = {
+  let options = {
     username: config.sshusername,
     password: config.sshpassword,
     host: config.host,
@@ -89,8 +89,8 @@ function createSSHtunnel(config) {
 }
 
 function createRfbConnection(config, socket) {
-  var r;
-  if (Config.connType == 'rfbssh') {
+  let r;
+  if (Param.connType == 'rfbssh') {
     try {
       r = rfb.createConnection({
         host: '127.0.0.1',
@@ -130,12 +130,12 @@ function rfbConnect(r, socket) {
 
 function rfbDrawScreen(r, socket) {
   r.on('rect', function (rect) {
-    var bufferSize = rect.width * rect.height * 3;
-    var rgb = new Buffer.alloc(bufferSize, 'binary');
-    var offset = 0;
+    let bufferSize = rect.width * rect.height * 3;
+    let rgb = new Buffer.alloc(bufferSize, 'binary');
+    let offset = 0;
 
     try {
-      for (var i = 0; i < rect.data.length; i += 4) {
+      for (let i = 0; i < rect.data.length; i += 4) {
         rgb[offset++] = rect.data[i + 2];
         rgb[offset++] = rect.data[i + 1];
         rgb[offset++] = rect.data[i];
@@ -144,29 +144,14 @@ function rfbDrawScreen(r, socket) {
       //Ignore error on unlock screen.
     }
 
-    var pngImage = new Jimp({
+    let pngImage = new Jimp({
       data: rgb,
       width: rect.width,
       height: rect.height,
     });
 
-    var buffer;
-    if (Config.compType == 'comppng') {
-      pngImage.getBase64(Jimp.MIME_PNG, function (err, res) {
-        buffer = res;
-      });
-    }
-    if (Config.compType == 'compjpg') {
-      pngImage.getBase64(Jimp.MIME_JPEG, function (err, res) {
-        buffer = res;
-      });
-    }
-    if (Config.compType == 'compbmp') {
-      pngImage.getBase64(Jimp.MIME_BMP, function (err, res) {
-        buffer = res;
-      });
-    }
-
+    let buffer = getBuffer(pngImage);
+    
     socket.emit('frame', {
       x: rect.x,
       y: rect.y,
@@ -184,7 +169,7 @@ function rfbDrawScreen(r, socket) {
 }
 
 function createRdpConnection(config, socket) {
-  var rdpClient = rdp.createClient({
+  let rdpClient = rdp.createClient({
     domain: config.rdpdomainname,
     userName: config.rdpusername,
     password: config.password,
@@ -214,19 +199,15 @@ function rdpConnect(rdpClient, socket) {
 
 function rdpDraw(rdpClient, socket) {
   rdpClient.on('bitmap', function (bitmap) {
-    var pngImage = new Jimp({
+    let pngImage = new Jimp({
       data: bitmap.data,
       width: bitmap.width,
       height: bitmap.height,
     });
 
-    var buffer;
-    pngImage.getBase64(Jimp.MIME_PNG, function (err, res) {
-      buffer = res;
-    });
-    //console.log(bitmap);
-    //new Promise(r => setTimeout(r, 1000));
-    //setTimeout(function () { }, 1000); //Slow down buffer process
+    let buffer = getBuffer(pngImage);
+    
+    setTimeout(function () { }, 1000); //Slow down buffer process
     socket.emit('frame', {
       x: bitmap.destLeft,
       y: bitmap.destTop,
@@ -236,6 +217,26 @@ function rdpDraw(rdpClient, socket) {
     });
   })
 }
+
+function getBuffer (pngImage) {
+  let buffer;
+  if (Param.compType == 'comppng') {
+    pngImage.getBase64(Jimp.MIME_PNG, function (err, res) {
+      buffer = res;
+    });
+  }
+  if (Param.compType == 'compjpg') {
+    pngImage.getBase64(Jimp.MIME_JPEG, function (err, res) {
+      buffer = res;
+    });
+  }
+  if (Param.compType == 'compbmp') {
+    pngImage.getBase64(Jimp.MIME_BMP, function (err, res) {
+      buffer = res;
+    });
+  }
+  return buffer;
+};
 
 function rfbErrorHandler(r, socket) {
   r.on('error', function (err) {

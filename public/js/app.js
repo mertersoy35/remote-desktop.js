@@ -73,6 +73,7 @@ document.getElementById('disconnect-button').addEventListener('click', function(
 
 document.getElementById('login-button').addEventListener('click', function() {
   focusCanvas();
+  document.getElementById('loader').style.display = 'block';
   connect({
     host: document.getElementById('ipaddress').value,
     port: parseInt(document.getElementById('portnumber').value, 10),
@@ -84,9 +85,13 @@ document.getElementById('login-button').addEventListener('click', function() {
     rdpdomainname: document.getElementById('rdpdomainname').value,
     rdpusername: document.getElementById('rdpusername').value,
   }).then(function() {
+    document.getElementById('loader').style.display = 'none';
     document.getElementById('login-page').style.display = 'none';
     document.getElementById('rfb-screen').style.display = 'block';
   }).catch(function(err){
     console.log(err);
+    disconnect();
+    document.getElementById('loader').style.display = 'none';
+    alert('Connection failed!');
   })
 }, true);

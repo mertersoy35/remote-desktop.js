@@ -9,7 +9,7 @@ function getMousePosition(canvas, e) {
   };
 }
 
-const focusCanvas = function getFocus() {
+const focusCanvas = function getFocus(canvasImage) {
   document.getElementById('rfb-canvas').focus();
 
   if (radVal == 'rdp') {
@@ -21,15 +21,15 @@ const focusCanvas = function getFocus() {
       keyEventEmit(e.keyCode, null, 0);
       e.preventDefault();
     })
-    
+
     function mouseMap(button) {
-      switch(button) {
-      case 0:
-        return 1;
-      case 2:
-        return 2;
-      default:
-        return 0;
+      switch (button) {
+        case 0:
+          return 1;
+        case 2:
+          return 2;
+        default:
+          return 0;
       }
     };
 
