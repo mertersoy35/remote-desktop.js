@@ -9,7 +9,7 @@ function getMousePosition(canvas, e) {
   };
 }
 
-const focusCanvas = function getFocus(canvasImage) {
+const focusCanvas = function getFocus() {
   document.getElementById('rfb-canvas').focus();
 
   if (radVal == 'rdp') {
