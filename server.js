@@ -180,23 +180,24 @@ function createRdpConnection(config, socket) {
     enablePerf: true,
     autoLogin: true,
     decompress: true,
-    screen: { width: 1024, height: 768 },
+    screen: { width: config.rdpwidth, height: config.rdpheight },
     locale: 'en',
     logLevel: 'INFO'
   });
-  rdpConnect(rdpClient, socket);
+  rdpConnect(rdpClient, socket, config);
   rdpDraw(rdpClient, socket);
   rdpErrorHandler(rdpClient);
   rdpClient.connect(config.host, 3389);
   return rdpClient;
 }
 
-function rdpConnect(rdpClient, socket) {
+function rdpConnect(rdpClient, socket, config) {
   rdpClient.on('connect', function () {
     console.log('RDP connection successful...');
+    console.log(rdpClient.desktopWidth);
     socket.emit('remote', {
-      width: 1024,
-      height: 768,
+      width: config.rdpwidth,
+      height: config.rdpheight,
     });
   });
 }

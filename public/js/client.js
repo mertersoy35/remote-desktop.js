@@ -146,6 +146,8 @@ const connect = function (config) {
     sshpassword: config.sshpassword,
     rdpdomainname: config.rdpdomainname,
     rdpusername: config.rdpusername,
+    rdpwidth: config.rdpwidth,
+    rdpheight: config.rdpheight,
   });
   return new Promise(function (resolve, reject) {
     let timeout = setTimeout(function () {
