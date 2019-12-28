@@ -7,7 +7,7 @@ document.getElementById('rb-rfb').addEventListener('click', function() {
   document.getElementById('sshpass').style.display = "none";
   document.getElementById('sshport').style.display = "none";
   document.getElementById('sshtunnelport').style.display = "none";
-  document.getElementById('rfbport').style.display = "block";
+  document.getElementById('port').style.display = "block";
   document.getElementById('ipaddress_help').innerHTML = "Please enter the IP address of VNC connection.";
   document.getElementById('pass-lbl').innerHTML = "VNC Password:";
   document.getElementById('rdpuser').style.display = "none";
@@ -24,7 +24,7 @@ document.getElementById('rb-rfb-ssh').addEventListener('click', function() {
   document.getElementById('sshpass').style.display = "block";
   document.getElementById('sshport').style.display = "block";
   document.getElementById('sshtunnelport').style.display = "block";
-  document.getElementById('rfbport').style.display = "block";
+  document.getElementById('port').style.display = "block";
   document.getElementById('ipaddress_help').innerHTML = "Please enter the IP address of SSH connection.";
   document.getElementById('pass-lbl').innerHTML = "VNC Password:";
   document.getElementById('rdpuser').style.display = "none";
@@ -41,7 +41,7 @@ document.getElementById('rb-rdp').addEventListener('click', function() {
   document.getElementById('sshpass').style.display = "none";
   document.getElementById('sshport').style.display = "none";
   document.getElementById('sshtunnelport').style.display = "none";
-  document.getElementById('rfbport').style.display = "none";
+  document.getElementById('port').style.display = "none";
   document.getElementById('ipaddress_help').innerHTML = "Please enter the IP address of RDP connection.";
   document.getElementById('pass-lbl').innerHTML = "RDP Password:";
   document.getElementById('rdpuser').style.display = "block";
