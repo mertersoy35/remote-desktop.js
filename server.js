@@ -187,7 +187,7 @@ function createRdpConnection(config, socket) {
   rdpConnect(rdpClient, socket, config);
   rdpDraw(rdpClient, socket);
   rdpErrorHandler(rdpClient);
-  rdpClient.connect(config.host, 3389);
+  rdpClient.connect(config.host, config.port);
   return rdpClient;
 }
 

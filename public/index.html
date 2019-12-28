@@ -27,6 +27,12 @@
             <small id="ipaddress_help" class="form-text text-muted">Please enter the IP address of VNC
               connection.</small>
           </div>
+          <div id="port" class="form-group">
+            <label id="port-lbl" for="portnumber">VNC Port:</label>
+            <input type="text" class="form-control" id="portnumber" aria-describedby="portnumber_help"
+              value="Enter port">
+            <small id="portnumber_help" class="form-text text-muted">Please enter the port of VNC connection.</small>
+          </div>
           <div id="rdpdomain" class="form-group" style="display:none">
             <label for="rdpdomainname">RDP Domain:</label>
             <input type="text" class="form-control" id="rdpdomainname" aria-describedby="rdpdomainname_help"
@@ -39,12 +45,6 @@
             <input type="text" class="form-control" id="rdpusername" aria-describedby="rdpusername_help"
               placeholder="Enter RDP username">
             <small id="rdpusername_help" class="form-text text-muted">Please enter the RDP username.</small>
-          </div>
-          <div id="port" class="form-group">
-            <label for="portnumber">VNC Port:</label>
-            <input type="text" class="form-control" id="portnumber" aria-describedby="portnumber_help"
-              placeholder="Enter port">
-            <small id="portnumber_help" class="form-text text-muted">Please enter the port of VNC connection.</small>
           </div>
           <div id="pass" class="form-group">
             <label id="pass-lbl" for="password">VNC Password:</label>
