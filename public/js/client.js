@@ -12,7 +12,7 @@ function getMousePosition(canvas, e) {
 const focusCanvas = function getFocus() {
   document.getElementById('rfb-canvas').focus();
 
-  if (radVal == 'rdp' || 'rdpssh') {
+  if (radVal == 'rdp' || radVal == 'rdpssh') {
     document.addEventListener('keydown', this.handleKeyDown = function (e) {
       keyEventEmit(e.keyCode, null, 1);
       e.preventDefault();
@@ -186,7 +186,7 @@ const mouseEventEmit = function (x, y, button, state) {
 };
 
 const keyEventEmit = function (key, shift, state) {
-  if (radVal == 'rdp' || 'rdpssh') {
+  if (radVal == 'rdp' || radVal == 'rdpssh') {
     let unicode = rdpUnicode[key];
     let keyTransmit = rdpKeyMap[unicode];
     socket.emit('keys', {
