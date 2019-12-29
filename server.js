@@ -35,7 +35,13 @@ io.sockets.on('connection', function (socket) {
   });
   socket.on('remote', function (config) {
     let rdpClient;
-    if (Params.connType == 'rdp') {
+    if (Params.connType == 'rdp' || 'rdpssh') {
+      if (Params.connType == 'rdpssh') {
+        let sshTunnel = createSSHtunnel(config);
+        sshTunnel.on('error', function() {
+          console.log('SSH connection error!');
+        })
+      }
       if (rdpClient) {
         rdpClient.close(); // Close previous connection
       };
@@ -51,7 +57,7 @@ io.sockets.on('connection', function (socket) {
         console.log('Socket.io disconnected.');
       });
     }
-    else {
+    if (Params.connType == 'rfb' || 'rfbssh') {
       if (Params.connType == 'rfbssh') {
         let sshTunnel = createSSHtunnel(config);
         sshTunnel.on('error', function() {
@@ -194,7 +200,6 @@ function createRdpConnection(config, socket) {
 function rdpConnect(rdpClient, socket, config) {
   rdpClient.on('connect', function () {
     console.log('RDP connection successful...');
-    console.log(rdpClient.desktopWidth);
     socket.emit('remote', {
       width: config.rdpwidth,
       height: config.rdpheight,

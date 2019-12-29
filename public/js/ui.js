@@ -61,6 +61,26 @@ document.getElementById('rb-rdp').addEventListener('click', function() {
     conn: radVal
   });
 });
+document.getElementById('rb-rdp-ssh').addEventListener('click', function() {
+  radVal = this.value;
+  document.getElementById('sshuser').style.display = "block";
+  document.getElementById('sshpass').style.display = "block";
+  document.getElementById('sshport').style.display = "block";
+  document.getElementById('sshtunnelport').style.display = "block";
+  document.getElementById('port-lbl').innerHTML = "RDP Port:";
+  document.getElementById('ipaddress_help').innerHTML = "Please enter the IP address of SSH connection.";
+  document.getElementById('pass-lbl').innerHTML = "RDP Password:";
+  document.getElementById('password_help').innerHTML = "Please enter the password of RDP connection.";
+  document.getElementById('portnumber_help').innerHTML = "Please enter the port of RDP connection.";
+  document.getElementById('portnumber').value = 3389;
+  document.getElementById('rdpuser').style.display = "block";
+  document.getElementById('rdpdomain').style.display = "block";
+  document.getElementById('dimwidth').style.display = "block";
+  document.getElementById('dimheight').style.display = "block";
+  socket.emit('type', {
+    conn: radVal
+  });
+});
 
 function compEmit(compType) {
   socket.emit('comp', {
