@@ -34,43 +34,35 @@ io.sockets.on('connection', function (socket) {
     console.log('Compression type changed to: ' + Params.compType);
   });
   socket.on('remote', function (config) {
-    let rdpClient;
+    if (Params.connType == 'rfb') {
+      let r = createRfbConnection(config, socket);
+      rfbSocketHandler(r, socket);
+    }
+    if (Params.connType == 'rfbssh') {
+      let sshTunnel = createSSHtunnel(config);
+      sshTunnel.on('error', function () {
+        console.log('SSH connection error!');
+      })
+      let r = createRfbConnection(config, socket);
+      rfbSocketHandler(r, socket);
+    }
     if (Params.connType == 'rdp') {
+      let rdpClient;
       if (rdpClient) {
         rdpClient.close(); // Close previous connection
       };
       rdpClient = createRdpConnection(config, socket);
-      socket.on('mouse', function (mouse) {
-        rdpClient.sendPointerEvent(mouse.x, mouse.y, mouse.button, mouse.state);
-      });
-      socket.on('keys', function (keys) {
-        rdpClient.sendKeyEventScancode(keys.key, keys.state);
-      });
-      socket.on('disconnect', function () {
-        rdpClient.close();
-        console.log('Socket.io disconnected.');
-      });
+      rdpSocketHandler(rdpClient, socket);
     }
-    else {
-      if (Params.connType == 'rfbssh') {
-        let sshTunnel = createSSHtunnel(config);
-        sshTunnel.on('error', function() {
-          console.log('SSH connection error!');
-        })
-      }
-      let r = createRfbConnection(config, socket);
-      socket.on('mouse', function (mouse) {
-        r.pointerEvent(mouse.x, mouse.y, mouse.button);
-      });
-      socket.on('keys', function (keys) {
-        r.keyEvent(keys.key, keys.state);
-      });
-      socket.on('disconnect', function () {
-        r.end();
-        console.log('Socket.io disconnected.');
-      });
+    if (Params.connType == 'rdpssh') {
+      let rdpClient;
+      let sshTunnel = createSSHtunnel(config);
+      sshTunnel.on('error', function () {
+        console.log('SSH connection error!');
+      })
+      rdpClient = createRdpConnection(config, socket);
+      rdpSocketHandler(rdpClient, socket);
     }
-
   });
 });
 
@@ -155,7 +147,7 @@ function rfbDrawScreen(r, socket) {
     });
 
     let buffer = getBuffer(pngImage);
-    
+
     socket.emit('frame', {
       x: rect.x,
       y: rect.y,
@@ -187,14 +179,18 @@ function createRdpConnection(config, socket) {
   rdpConnect(rdpClient, socket, config);
   rdpDraw(rdpClient, socket);
   rdpErrorHandler(rdpClient);
-  rdpClient.connect(config.host, config.port);
+  if (Params.connType == 'rdpssh') {
+    rdpClient.connect('127.0.0.1', config.sshtunnelport);
+  }
+  else {
+    rdpClient.connect(config.host, config.port);
+  }
   return rdpClient;
 }
 
 function rdpConnect(rdpClient, socket, config) {
   rdpClient.on('connect', function () {
     console.log('RDP connection successful...');
-    console.log(rdpClient.desktopWidth);
     socket.emit('remote', {
       width: config.rdpwidth,
       height: config.rdpheight,
@@ -211,7 +207,7 @@ function rdpDraw(rdpClient, socket) {
     });
 
     let buffer = getBuffer(pngImage);
-    
+
     setTimeout(function () { }, 1000); //Slow down buffer process
     socket.emit('frame', {
       x: bitmap.destLeft,
@@ -223,7 +219,7 @@ function rdpDraw(rdpClient, socket) {
   })
 }
 
-function getBuffer (pngImage) {
+function getBuffer(pngImage) {
   let buffer;
   if (Params.compType == 'comppng') {
     pngImage.getBase64(Jimp.MIME_PNG, function (err, res) {
@@ -242,6 +238,32 @@ function getBuffer (pngImage) {
   }
   return buffer;
 };
+
+function rfbSocketHandler(r, socket) {
+  socket.on('mouse', function (mouse) {
+    r.pointerEvent(mouse.x, mouse.y, mouse.button);
+  });
+  socket.on('keys', function (keys) {
+    r.keyEvent(keys.key, keys.state);
+  });
+  socket.on('disconnect', function () {
+    r.end();
+    console.log('Socket.io disconnected.');
+  });
+}
+
+function rdpSocketHandler(rdpClient, socket) {
+  socket.on('mouse', function (mouse) {
+    rdpClient.sendPointerEvent(mouse.x, mouse.y, mouse.button, mouse.state);
+  });
+  socket.on('keys', function (keys) {
+    rdpClient.sendKeyEventScancode(keys.key, keys.state);
+  });
+  socket.on('disconnect', function () {
+    rdpClient.close();
+    console.log('Socket.io disconnected.');
+  });
+}
 
 function rfbErrorHandler(r, socket) {
   r.on('error', function (err) {

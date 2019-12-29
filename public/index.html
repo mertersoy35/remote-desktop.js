@@ -58,9 +58,9 @@
             <input type="text" class="form-control" id="sshtunnelportnumber" aria-describedby="sshtunnelportnumber_help"
               placeholder="Enter port">
             <small id="sshtunnelportnumber_help" class="form-text text-muted">Please enter the port of SSH tunneling.
-              This port tunnels the connection to the RFB port.
-              If application is installed on same server as RFB connection supplied do not use same port as RFB port.
-              <br>Ex: ssh -L [SSH_TUNNEL_PORT]:127.0.0.1:[RFB_PORT] [IP_ADRESS]</small>
+              This port tunnels the connection to the desired port.
+              WARNING: If accessing to localhost remote, do not use the same port as SSH tunnel.
+              <br>EX: ssh -L <i>ssh_tunnel_port</i>:127.0.0.1:<i>remote_port</i> <i>ip_adress</i></small>
           </div>
           <div id="sshport" class="form-group" style="display:none">
             <label for="sshportnumber">SSH Port:</label>
@@ -124,6 +124,11 @@
             <input type="radio" name="connType" id="rb-rdp" aria-describedby="rb-rdp-help" value="rdp" />
             <label for="rb-rdp">RDP</label><br />
             <small id="rb-rdp-help" class="form-text text-muted">RDP with encryption. Works on Windows.</small>
+          </div>
+          <div class="form-group">
+            <input type="radio" name="connType" id="rb-rdp-ssh" aria-describedby="rb-rdp-ssh-help" value="rdpssh" />
+            <label for="rb-rdp-ssh">RDP with SSH tunneling</label><br />
+            <small id="rb-rdp-ssh-help" class="form-text text-muted">RDP with SSH tunneling. Helps firewall issues. Works on Windows.</small>
           </div>
         </form>
 
