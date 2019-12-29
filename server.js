@@ -24,7 +24,7 @@ console.log("Start server again with 'node " + process.argv[1].split("/").slice(
 io = io.listen(server);
 
 io.sockets.on('connection', function (socket) {
-  console.log('Socket.io entablished...');
+  console.log('Socket.io established...');
   socket.on('type', function (type) {
     Params.connType = type.conn;
     console.log('Connection type changed to: ' + Params.connType);
@@ -96,7 +96,7 @@ function createRfbConnection(config, socket) {
     } catch (err) {
       console.log(err);
     }
-    console.log('Connection entablished: VNC with SSH tunneling.')
+    console.log('Connection established: VNC with SSH tunneling.')
   } else {
     try {
       r = rfb.createConnection({
@@ -107,7 +107,7 @@ function createRfbConnection(config, socket) {
     } catch (err) {
       console.log(err);
     }
-    console.log('Connection entablished: VNC.')
+    console.log('Connection established: VNC.')
   }
   rfbConnect(r, socket);
   rfbDrawScreen(r, socket);
