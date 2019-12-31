@@ -79,7 +79,7 @@ function createSSHtunnel(config) {
     keepAlive: true
   }
   let sshTunnel = tunnel(options, function () {
-    console.log('SSH connection entablishing...');
+    console.log('SSH connection establishing...');
   });
   return sshTunnel;
 }
