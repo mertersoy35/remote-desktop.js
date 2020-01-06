@@ -125,13 +125,13 @@ document.getElementById('ctrl-alt-del').addEventListener('click', function () {
   }
 })
 
-const copyFrame = function (rect) {
+const copyFrame = function (bitmap) {
   let img = new Image();
-  img.width = rect.width;
-  img.height = rect.height;
-  img.src = rect.image;
+  img.width = bitmap.width;
+  img.height = bitmap.height;
+  img.src = bitmap.image;
   img.onload = function () {
-    canvasImage.drawImage(img, rect.x, rect.y, rect.width, rect.height);
+    canvasImage.drawImage(img, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
   }
 }
 
