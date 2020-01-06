@@ -125,16 +125,16 @@ function rfbConnect(r, socket) {
 }
 
 function rfbDrawScreen(r, socket) {
-  r.on('rect', function (rect) {
-    let bufferSize = rect.width * rect.height * 3;
+  r.on('rect', function (bitmap) {
+    let bufferSize = bitmap.width * bitmap.height * 3;
     let rgb = new Buffer.alloc(bufferSize, 'binary');
     let offset = 0;
 
     try {
-      for (let i = 0; i < rect.data.length; i += 4) {
-        rgb[offset++] = rect.data[i + 2];
-        rgb[offset++] = rect.data[i + 1];
-        rgb[offset++] = rect.data[i];
+      for (let i = 0; i < bitmap.data.length; i += 4) {
+        rgb[offset++] = bitmap.data[i + 2];
+        rgb[offset++] = bitmap.data[i + 1];
+        rgb[offset++] = bitmap.data[i];
       }
     } catch (err) {
       //Ignore error on unlock screen.
@@ -142,17 +142,17 @@ function rfbDrawScreen(r, socket) {
 
     let pngImage = new Jimp({
       data: rgb,
-      width: rect.width,
-      height: rect.height,
+      width: bitmap.width,
+      height: bitmap.height,
     });
 
     let buffer = getBuffer(pngImage);
 
     socket.emit('frame', {
-      x: rect.x,
-      y: rect.y,
-      width: rect.width,
-      height: rect.height,
+      x: bitmap.x,
+      y: bitmap.y,
+      width: bitmap.width,
+      height: bitmap.height,
       image: buffer
     });
 
