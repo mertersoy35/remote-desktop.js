@@ -35,16 +35,16 @@ io.sockets.on('connection', function (socket) {
   });
   socket.on('remote', function (config) {
     if (Params.connType == 'rfb') {
-      let r = createRfbConnection(config, socket);
-      rfbSocketHandler(r, socket);
+      let rfbClient = createRfbConnection(config, socket);
+      rfbSocketHandler(rfbClient, socket);
     }
     if (Params.connType == 'rfbssh') {
       let sshTunnel = createSSHtunnel(config);
       sshTunnel.on('error', function () {
         console.log('SSH connection error!');
       })
-      let r = createRfbConnection(config, socket);
-      rfbSocketHandler(r, socket);
+      let rfbClient = createRfbConnection(config, socket);
+      rfbSocketHandler(rfbClient, socket);
     }
     if (Params.connType == 'rdp') {
       let rdpClient;
@@ -85,10 +85,10 @@ function createSSHtunnel(config) {
 }
 
 function createRfbConnection(config, socket) {
-  let r;
+  let rfbClient;
   if (Params.connType == 'rfbssh') {
     try {
-      r = rfb.createConnection({
+      rfbClient = rfb.createConnection({
         host: '127.0.0.1',
         port: config.sshtunnelport,
         password: config.password,
@@ -99,7 +99,7 @@ function createRfbConnection(config, socket) {
     console.log('Connection established: VNC with SSH tunneling.')
   } else {
     try {
-      r = rfb.createConnection({
+      rfbClient = rfb.createConnection({
         host: config.host,
         port: config.port,
         password: config.password,
@@ -109,23 +109,23 @@ function createRfbConnection(config, socket) {
     }
     console.log('Connection established: VNC.')
   }
-  rfbConnect(r, socket);
-  rfbDrawScreen(r, socket);
-  rfbErrorHandler(r);
-  return r;
+  rfbConnect(rfbClient, socket);
+  rfbDrawScreen(rfbClient, socket);
+  rfbErrorHandler(rfbClient);
+  return rfbClient;
 }
 
-function rfbConnect(r, socket) {
-  r.on('connect', function () {
+function rfbConnect(rfbClient, socket) {
+  rfbClient.on('connect', function () {
     socket.emit('remote', {
-      width: r.width,
-      height: r.height,
+      width: rfbClient.width,
+      height: rfbClient.height,
     });
   });
 }
 
-function rfbDrawScreen(r, socket) {
-  r.on('rect', function (bitmap) {
+function rfbDrawScreen(rfbClient, socket) {
+  rfbClient.on('rect', function (bitmap) {
     let bufferSize = bitmap.width * bitmap.height * 3;
     let rgb = new Buffer.alloc(bufferSize, 'binary');
     let offset = 0;
@@ -156,7 +156,7 @@ function rfbDrawScreen(r, socket) {
       image: buffer
     });
 
-    r.requestUpdate(true, 0, 0, r.width, r.height);
+    rfbClient.requestUpdate(true, 0, 0, rfbClient.width, rfbClient.height);
 
     process.on('uncaughtException', function (err) {
       console.log('Caught exception: ', err);
@@ -239,15 +239,15 @@ function getBuffer(pngImage) {
   return buffer;
 };
 
-function rfbSocketHandler(r, socket) {
+function rfbSocketHandler(rfbClient, socket) {
   socket.on('mouse', function (mouse) {
-    r.pointerEvent(mouse.x, mouse.y, mouse.button);
+    rfbClient.pointerEvent(mouse.x, mouse.y, mouse.button);
   });
   socket.on('keys', function (keys) {
-    r.keyEvent(keys.key, keys.state);
+    rfbClient.keyEvent(keys.key, keys.state);
   });
   socket.on('disconnect', function () {
-    r.end();
+    rfbClient.end();
     console.log('Socket.io disconnected.');
   });
 }
@@ -265,8 +265,8 @@ function rdpSocketHandler(rdpClient, socket) {
   });
 }
 
-function rfbErrorHandler(r, socket) {
-  r.on('error', function (err) {
+function rfbErrorHandler(rfbClient, socket) {
+  rfbClient.on('error', function (err) {
     console.error('Error occured: ', err);
   });
 }
