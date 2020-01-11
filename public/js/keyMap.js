@@ -531,6 +531,7 @@ var rdpUnicode = {
   122 : "F11",
   123 : "F12",
   192 : "Backquote",
+  46 : "Delete",
   49 : "Digit1",
   50 : "Digit2",
   51 : "Digit3",

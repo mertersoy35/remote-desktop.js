@@ -117,11 +117,22 @@ document.getElementById('ctrl-alt-del').addEventListener('click', function () {
   let nums = [17, 18, 46];
   for (let i = 0; i < nums.length; i++) {
     let n = nums[i];
-    let k = rfbKeyMap[n][0];
-    socket.emit('keys', {
-      key: k,
-      state: 1,
-    });
+    if (radVal == 'rfb' || radVal == 'rfbssh') {
+      let k = rfbKeyMap[n][0];
+      socket.emit('keys', {
+        key: k,
+        state: 1,
+      });
+    }
+    if (radVal == 'rdp' || radVal == 'rdpssh') {
+      let unicode = rdpUnicode[n];
+      let k = rdpKeyMap[unicode];
+      console.log(k);
+      socket.emit('keys', {
+        key: k,
+        state: 1,
+      })
+    }
   }
 })
 
