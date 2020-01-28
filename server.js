@@ -122,7 +122,7 @@ function createRfbConnection(config, socket) {
 
 function rfbConnect(rfbClient, socket) { // When VNC connected it sends screen size and resolves the Promise.
   rfbClient.on('connect', function () {
-    socket.emit('remote', {
+    socket.emit('remote', { // Transmit the initial screen information
       width: rfbClient.width,
       height: rfbClient.height,
     });
@@ -164,88 +164,88 @@ function rfbDrawScreen(rfbClient, socket) {
 
     rfbClient.requestUpdate(true, 0, 0, rfbClient.width, rfbClient.height); // Update the screen
 
-    process.on('uncaughtException', function (err) {
+    process.on('uncaughtException', function (err) { //Uncaught exception handler
       console.log('Caught exception: ', err);
     });
   });
 }
 
-function createRdpConnection(config, socket) {
+function createRdpConnection(config, socket) { // Create RDP connection function
   let rdpClient = rdp.createClient({
-    domain: config.rdpdomainname,
-    userName: config.rdpusername,
-    password: config.password,
-    enablePerf: true,
-    autoLogin: true,
-    decompress: true,
-    screen: { width: config.rdpwidth, height: config.rdpheight },
-    locale: 'en',
-    logLevel: 'INFO'
+    domain: config.rdpdomainname, // RDP domain name or ip
+    userName: config.rdpusername, // RDP username
+    password: config.password, // RDP password
+    enablePerf: true, // Disables background image
+    autoLogin: true, // Bypass lockscreen
+    decompress: true, // Used to decompress compressed image with RLE alghoritm.
+    screen: { width: config.rdpwidth, height: config.rdpheight }, // Screen dimension info
+    locale: 'en', // Localization
+    logLevel: 'INFO' // DEBUG logLevel gives more information
   });
-  rdpConnect(rdpClient, socket, config);
-  rdpDraw(rdpClient, socket);
-  rdpErrorHandler(rdpClient);
+  rdpConnect(rdpClient, socket, config); // Send connection details to client.
+  rdpDraw(rdpClient, socket); // Send screen data
+  rdpErrorHandler(rdpClient); // Error handling
   if (Params.connType == 'rdpssh') {
-    rdpClient.connect('127.0.0.1', config.sshtunnelport);
+    rdpClient.connect('127.0.0.1', config.sshtunnelport); // Creates SSH connection on localhost
   }
   else {
-    rdpClient.connect(config.host, config.port);
+    rdpClient.connect(config.host, config.port); // Otherwise connect normally
   }
   return rdpClient;
 }
 
-function rdpConnect(rdpClient, socket, config) {
+function rdpConnect(rdpClient, socket, config) { // When RDP connected it sends screen size and resolves the Promise.
   rdpClient.on('connect', function () {
     console.log('RDP connection successful...');
-    socket.emit('remote', {
+    socket.emit('remote', { // Transmit the initial screen information
       width: config.rdpwidth,
       height: config.rdpheight,
     });
   });
 }
 
-function rdpDraw(rdpClient, socket) {
+function rdpDraw(rdpClient, socket) { // Draw function triggers when bitmap event recieved.
   rdpClient.on('bitmap', function (bitmap) {
-    let pngImage = new Jimp({
-      data: bitmap.data,
-      width: bitmap.width,
-      height: bitmap.height,
+    let pngImage = new Jimp({ // New Jimp object is created to make it available to convert.
+      data: bitmap.data, // Input file, can be file or buffer (Uncomprossed image after RLE decompress.)
+      width: bitmap.width, // Width of created image
+      height: bitmap.height, // Height of created image
     });
 
     let buffer = getBuffer(pngImage);
 
     setTimeout(function () { }, 1000); //Slow down buffer process
     socket.emit('frame', {
-      x: bitmap.destLeft,
-      y: bitmap.destTop,
-      width: bitmap.width,
-      height: bitmap.height,
-      image: buffer,
+      x: bitmap.destLeft, // X coordinate of the left part of the image
+      y: bitmap.destTop, // Y coordinate of the top part of the image
+      width: bitmap.width, // Image width
+      height: bitmap.height, // Image height
+      image: buffer, //Image file in Base64 string
     });
   })
 }
 
-function getBuffer(pngImage) {
+function getBuffer(pngImage) { // This function gets the image buffer and converts to other image formats.
   let buffer;
   if (Params.compType == 'comppng') {
-    pngImage.getBase64(Jimp.MIME_PNG, function (err, res) {
+    pngImage.getBase64(Jimp.MIME_PNG, function (err, res) { // Get PNG base64 format
       buffer = res;
     });
   }
   if (Params.compType == 'compjpg') {
-    pngImage.getBase64(Jimp.MIME_JPEG, function (err, res) {
+    pngImage.getBase64(Jimp.MIME_JPEG, function (err, res) { // Get JPG base64 format
       buffer = res;
     });
   }
   if (Params.compType == 'compbmp') {
-    pngImage.getBase64(Jimp.MIME_BMP, function (err, res) {
+    pngImage.getBase64(Jimp.MIME_BMP, function (err, res) { // Get BMP base64 format
       buffer = res;
     });
   }
   return buffer;
 };
 
-function rfbSocketHandler(rfbClient, socket) {
+function rfbSocketHandler(rfbClient, socket) { // Function to handle socket events recieved from client
   socket.on('mouse', function (mouse) {
     rfbClient.pointerEvent(mouse.x, mouse.y, mouse.button);
   });
@@ -258,7 +258,7 @@ function rfbSocketHandler(rfbClient, socket) {
   });
 }
 
-function rdpSocketHandler(rdpClient, socket) {
+function rdpSocketHandler(rdpClient, socket) { // Function to handle socket events recieved from client
   socket.on('mouse', function (mouse) {
     rdpClient.sendPointerEvent(mouse.x, mouse.y, mouse.button, mouse.state);
   });
@@ -271,13 +271,13 @@ function rdpSocketHandler(rdpClient, socket) {
   });
 }
 
-function rfbErrorHandler(rfbClient) {
+function rfbErrorHandler(rfbClient) { // VNC error handler 
   rfbClient.on('error', function (err) {
-    console.error('Error occured: ', err);
+    console.error('Error occured: ', err); // Display error log
   });
 }
-function rdpErrorHandler(rdpClient) {
+function rdpErrorHandler(rdpClient) { // RDP error handler
   rdpClient.on('error', function (err) {
-    console.error('Error occured: ', err);
+    console.error('Error occured: ', err); // Display error log
   });
 }
