@@ -1,7 +1,7 @@
-const socket = io.connect({'force new connection': true});
+const socket = io.connect({'force new connection': true}); // Start Socket.io client
 
-var radVal;
-document.getElementById('rb-rfb').addEventListener('click', function() {
+var radVal; // Assign an empty radio value
+document.getElementById('rb-rfb').addEventListener('click', function() { // Change UI for VNC
   radVal = this.value;
   document.getElementById('sshuser').style.display = "none";
   document.getElementById('sshpass').style.display = "none";
@@ -17,11 +17,11 @@ document.getElementById('rb-rfb').addEventListener('click', function() {
   document.getElementById('rdpdomain').style.display = "none";
   document.getElementById('dimwidth').style.display = "none";
   document.getElementById('dimheight').style.display = "none";
-  socket.emit('type', {
+  socket.emit('type', { // Transmit connection type
     conn: radVal
   });
 });
-document.getElementById('rb-rfb-ssh').addEventListener('click', function() {
+document.getElementById('rb-rfb-ssh').addEventListener('click', function() { // Change UI for VNC-SSH
   radVal = this.value;
   document.getElementById('sshuser').style.display = "block";
   document.getElementById('sshpass').style.display = "block";
@@ -37,11 +37,11 @@ document.getElementById('rb-rfb-ssh').addEventListener('click', function() {
   document.getElementById('rdpdomain').style.display = "none";
   document.getElementById('dimwidth').style.display = "none";
   document.getElementById('dimheight').style.display = "none";
-  socket.emit('type', {
+  socket.emit('type', { // Transmit connection type
     conn: radVal
   });
 });
-document.getElementById('rb-rdp').addEventListener('click', function() {
+document.getElementById('rb-rdp').addEventListener('click', function() { // Change UI for RDP
   radVal = this.value;
   document.getElementById('sshuser').style.display = "none";
   document.getElementById('sshpass').style.display = "none";
@@ -57,11 +57,11 @@ document.getElementById('rb-rdp').addEventListener('click', function() {
   document.getElementById('rdpdomain').style.display = "block";
   document.getElementById('dimwidth').style.display = "block";
   document.getElementById('dimheight').style.display = "block";
-  socket.emit('type', {
+  socket.emit('type', { // Transmit connection type
     conn: radVal
   });
 });
-document.getElementById('rb-rdp-ssh').addEventListener('click', function() {
+document.getElementById('rb-rdp-ssh').addEventListener('click', function() { // Change UI for RDP-SSH
   radVal = this.value;
   document.getElementById('sshuser').style.display = "block";
   document.getElementById('sshpass').style.display = "block";
@@ -77,58 +77,58 @@ document.getElementById('rb-rdp-ssh').addEventListener('click', function() {
   document.getElementById('rdpdomain').style.display = "block";
   document.getElementById('dimwidth').style.display = "block";
   document.getElementById('dimheight').style.display = "block";
-  socket.emit('type', {
+  socket.emit('type', { // Transmit connection type
     conn: radVal
   });
 });
 
-function compEmit(compType) {
+function compEmit(compType) { // Transmit compression type
   socket.emit('comp', {
     comp: compType
   });
 }
 
-document.getElementById('comp-png').addEventListener('click', function() {
+document.getElementById('comp-png').addEventListener('click', function() { // Add event listener to PNG button
   compType = this.value;
   compEmit(compType);
 });
-document.getElementById('comp-jpg').addEventListener('click', function() {
+document.getElementById('comp-jpg').addEventListener('click', function() { // Add event listener to JPG button
   compType = this.value;
   compEmit(compType);
 });
-document.getElementById('comp-bmp').addEventListener('click', function() {
+document.getElementById('comp-bmp').addEventListener('click', function() { // Add event listener to BMP button
   compType = this.value;
   compEmit(compType);
 });
-document.getElementById('disconnect-button').addEventListener('click', function() {
+document.getElementById('disconnect-button').addEventListener('click', function() { // Removes canvas and reverts back to login page
   disconnect();
   document.getElementById('rfb-screen').style.display = 'none';
   document.getElementById('login-page').style.display = 'block';
 });
 
-document.getElementById('login-button').addEventListener('click', function() {
-  focusCanvas();
-  document.getElementById('loader').style.display = 'block';
-  connect({
-    host: document.getElementById('ipaddress').value,
-    port: parseInt(document.getElementById('portnumber').value, 10),
-    password: document.getElementById('password').value,
-    sshtunnelport: parseInt(document.getElementById('sshtunnelportnumber').value, 10),
-    sshport: parseInt(document.getElementById('sshportnumber').value, 10),
-    sshusername: document.getElementById('sshusername').value,
-    sshpassword: document.getElementById('sshpassword').value,
-    rdpdomainname: document.getElementById('rdpdomainname').value,
-    rdpusername: document.getElementById('rdpusername').value,
-    rdpwidth: parseInt(document.getElementById('width').value, 10),
-    rdpheight: parseInt(document.getElementById('height').value, 10),
+document.getElementById('login-button').addEventListener('click', function() { // Adding event listener for login
+  focusCanvas(); // Function to add all event listeners for remote desktop. Detailed in client.js
+  document.getElementById('loader').style.display = 'block'; // Display loading screen
+  connect({ // Connects to remote desktops with parameters. Detailed in client.js
+    host: document.getElementById('ipaddress').value, // IP or hostname of the remote desktop
+    port: parseInt(document.getElementById('portnumber').value, 10), // Port of remote desktop
+    password: document.getElementById('password').value, // Password for remote desktop
+    sshtunnelport: parseInt(document.getElementById('sshtunnelportnumber').value, 10), // Port to tunnel SSH. Can be any port.
+    sshport: parseInt(document.getElementById('sshportnumber').value, 10), // SSH connection port. Default 22
+    sshusername: document.getElementById('sshusername').value, // SSH Username 
+    sshpassword: document.getElementById('sshpassword').value, // SSH Password
+    rdpdomainname: document.getElementById('rdpdomainname').value, // Domain name of RDP connection.
+    rdpusername: document.getElementById('rdpusername').value, // Username of RDP connection.
+    rdpwidth: parseInt(document.getElementById('width').value, 10), // Screen width of RDP desktop
+    rdpheight: parseInt(document.getElementById('height').value, 10), // Screen height of RDP desktop
   }).then(function() {
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('login-page').style.display = 'none';
-    document.getElementById('rfb-screen').style.display = 'block';
-  }).catch(function(err){
-    console.log(err);
-    disconnect();
-    document.getElementById('loader').style.display = 'none';
-    alert('Connection failed!');
+    document.getElementById('loader').style.display = 'none'; // Remove loading screen
+    document.getElementById('login-page').style.display = 'none'; // Hide the login page
+    document.getElementById('rfb-screen').style.display = 'block'; // Reveal the canvas display
+  }).catch(function(err){ // Error handler
+    console.log(err); // Display error log on console
+    disconnect(); // If on error disconnect.
+    document.getElementById('loader').style.display = 'none'; // If on error hide the loading screen
+    alert('Connection failed!'); // Error message
   })
 }, true);
