@@ -1,4 +1,4 @@
-const canvas = document.getElementById('rfb-canvas');
+const canvas = document.getElementById('remote-canvas');
 const canvasImage = canvas.getContext('2d');
 
 function getMousePosition(canvas, e) {
@@ -10,7 +10,7 @@ function getMousePosition(canvas, e) {
 }
 
 const focusCanvas = function getFocus() {
-  document.getElementById('rfb-canvas').focus();
+  document.getElementById('remote-canvas').focus();
 
   if (radVal == 'rdp' || radVal == 'rdpssh') {
     document.addEventListener('keydown', this.handleKeyDown = function (e) {

@@ -102,7 +102,7 @@ document.getElementById('comp-bmp').addEventListener('click', function() { // Ad
 });
 document.getElementById('disconnect-button').addEventListener('click', function() { // Removes canvas and reverts back to login page
   disconnect();
-  document.getElementById('rfb-screen').style.display = 'none';
+  document.getElementById('remote-screen').style.display = 'none';
   document.getElementById('login-page').style.display = 'block';
 });
 
@@ -124,7 +124,7 @@ document.getElementById('login-button').addEventListener('click', function() { /
   }).then(function() {
     document.getElementById('loader').style.display = 'none'; // Remove loading screen
     document.getElementById('login-page').style.display = 'none'; // Hide the login page
-    document.getElementById('rfb-screen').style.display = 'block'; // Reveal the canvas display
+    document.getElementById('remote-screen').style.display = 'block'; // Reveal the canvas display
   }).catch(function(err){ // Error handler
     console.log(err); // Display error log on console
     disconnect(); // If on error disconnect.
