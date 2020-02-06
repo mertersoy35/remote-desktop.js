@@ -3,13 +3,13 @@ let io = require('socket.io'); // Import Socket.io module
 const http = require('http'); // Import HTTP module
 const rfb = require('rfb2'); // Import RFB module (VNC)
 const rdp = require('node-rdpjs'); // Import RDP module
-const Jimp = require('jimp'); //Import Jimp module (JavaScript counterpart of GNU Gimp)
+const Jimp = require('jimp'); // Import Jimp module (JavaScript counterpart of GNU Gimp)
 const tunnel = require('tunnel-ssh'); // Import SSH tunneling features
 const arg = process.argv[2]; // Entering port number from the command lines
 process.setMaxListeners(100); //Allows handling of more event listeners.
 
 const Params = {  // Parameter object for the server.
-  httpPort: arg || 3000,  // Default port is 3000 if arguement not passed.
+  httpPort: arg || 3000,  // Default port is 3000 if argument not passed.
   connType: 'rfb', // Default connection type is VNC
   compType: 'comppng',  // Default compression type is PNG.
 };
@@ -77,9 +77,9 @@ function createSSHtunnel(config) { // SSH tunneling function
     password: config.sshpassword, // SSH Password
     host: config.host, // IP or hostname of the remote desktop
     port: config.sshport, // SSH port, default 22
-    dstHost: '127.0.0.1', // Tunnelling will be binded locally
+    dstHost: '127.0.0.1', // Tunnelling will be bound locally
     dstPort: config.port, // Port of the blocked port
-    localHost: '127.0.0.1', // Tunnelling will be binded locally
+    localHost: '127.0.0.1', // Tunnelling will be bound locally
     localPort: config.sshtunnelport, // Port of the redirected port
     keepAlive: true
   }
@@ -136,7 +136,7 @@ function rfbDrawScreen(rfbClient, socket) {
     
     try {
       // This loop removes alpha bytes. Loop occurs until it reaches end of the buffer.
-      // Incrementing i 4 times neglects the aplha byte. Its saved on rgb.
+      // Incrementing i 4 times neglects the alpha byte. Its saved on rgb.
       for (let i = 0, byte=0; i < bitmap.data.length; i += 4) {
         rgb[byte++] = bitmap.data[i + 2]; // Copy red to temporary buffer.
         rgb[byte++] = bitmap.data[i + 1]; // Copy green to temporary buffer.
@@ -176,8 +176,8 @@ function createRdpConnection(config, socket) { // Create RDP connection function
     userName: config.rdpusername, // RDP username
     password: config.password, // RDP password
     enablePerf: true, // Disables background image
-    autoLogin: true, // Bypass lockscreen
-    decompress: true, // Used to decompress compressed image with RLE alghoritm.
+    autoLogin: true, // Bypass lock screen
+    decompress: true, // Used to decompress compressed image with RLE algorithm.
     screen: { width: config.rdpwidth, height: config.rdpheight }, // Screen dimension info
     locale: 'en', // Localization
     logLevel: 'INFO' // DEBUG logLevel gives more information
@@ -204,10 +204,10 @@ function rdpConnect(rdpClient, socket, config) { // When RDP connected it sends 
   });
 }
 
-function rdpDraw(rdpClient, socket) { // Draw function triggers when bitmap event recieved.
+function rdpDraw(rdpClient, socket) { // Draw function triggers when bitmap event received.
   rdpClient.on('bitmap', function (bitmap) {
     let pngImage = new Jimp({ // New Jimp object is created to make it available to convert.
-      data: bitmap.data, // Input file, can be file or buffer (Uncomprossed image after RLE decompress.)
+      data: bitmap.data, // Input file, can be file or buffer (Uncompressed image after RLE decompress.)
       width: bitmap.width, // Width of created image
       height: bitmap.height, // Height of created image
     });
