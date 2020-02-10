@@ -125,8 +125,7 @@ document.getElementById('ctrl-alt-del').addEventListener('click', function () { 
       });
     }
     if (radVal == 'rdp' || radVal == 'rdpssh') {
-      let unicode = rdpUnicode[n];
-      let k = rdpKeyMap[unicode];
+      let k = rdpKeyMap[n];
       console.log(k);
       socket.emit('keys', {
         key: k,
@@ -201,8 +200,7 @@ const mouseEventEmit = function (x, y, button, state) { // Function for transmit
 
 const keyEventEmit = function (key, shift, state) { // Function for transmitting keyboard information
   if (radVal == 'rdp' || radVal == 'rdpssh') {
-    let unicode = rdpUnicode[key]; // Load unicode character from array
-    let keyTransmit = rdpKeyMap[unicode]; // Load relevant RDP key code from the unicode character
+    let keyTransmit = rdpKeyMap[key];
     socket.emit('keys', {
       key: keyTransmit, // Transmits the key code
       state: state, // Information about state of keyboard (Pressed or not)
